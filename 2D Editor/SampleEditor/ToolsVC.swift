@@ -26,6 +26,6 @@ class ToolsVC: NSViewController
         let window:NSWindow = NSApplication.shared().windows.first!
         let mainWindowController:MainWindowController = window.windowController! as! MainWindowController
         let mainVC:MainVC = mainWindowController.contentViewController as! MainVC
-        mainVC.onSelectTool()
+        mainVC.onSelectImgTool()
     }
 }
