@@ -26,16 +26,24 @@ enum Appearance
 class MainVC: NSViewController
 {
     @IBOutlet var topLayer: MainSceneView!
+    var offPoint: NSPoint!
     
     override func viewDidLoad()
     {
         super.viewDidLoad()
         topLayer.delegate = self
+        offPoint = NSPoint()
     }
     
     override func mouseDown(with event: NSEvent)
     {
         topLayer.checkForHighlights(mouseLocation: CGPoint(x: event.locationInWindow.x, y: event.locationInWindow.y))
+        
+        if let selectedChild = topLayer.currentSelection
+        {
+            let screenPoint: NSPoint = NSPoint(x: event.locationInWindow.x, y: event.locationInWindow.y);
+            offPoint = self.view.convert(screenPoint, to: selectedChild)
+        }
     }
     
     override func mouseUp(with event: NSEvent)
@@ -47,11 +55,13 @@ class MainVC: NSViewController
     {
         if let selectedChild = topLayer.currentSelection
         {
-            selectedChild.setFrameOrigin(NSPoint(x: event.locationInWindow.x, y: event.locationInWindow.y))
+            let screenPoint: NSPoint = NSPoint(x: event.locationInWindow.x, y: event.locationInWindow.y);
+            let calcPoint: NSPoint = NSPoint(x: screenPoint.x - offPoint.x,
+                                             y: screenPoint.y - offPoint.y)
+            selectedChild.setFrameOrigin(calcPoint)
         }
     }
 }
-
 
 // MARK: - DestinationViewDelegate
 extension MainVC: DestinationViewDelegate

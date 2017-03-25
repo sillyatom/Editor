@@ -161,5 +161,4 @@ class MainSceneView: NSView
             path.stroke()
         }
     }
-    
 }
