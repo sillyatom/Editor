@@ -107,4 +107,20 @@ extension MainVC: DestinationViewDelegate
     {
         print("Process action not implemented!")    
     }
+    
+    func updateSceneInfoPublishReady()
+    {
+        OutputWriter.sharedInstance.startPublish()
+        
+        for child in topLayer.subviews
+        {
+            let imageView = child as! ExtImageView
+            if imageView != nil
+            {
+                OutputWriter.sharedInstance.addImageView(view: imageView as! NSImageView)
+            }
+        }
+        
+        OutputWriter.sharedInstance.endPublish()
+    }
 }

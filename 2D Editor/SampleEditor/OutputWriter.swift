@@ -31,83 +31,109 @@ enum OutputKeys
 
 class OutputWriter
 {
-    static var writer: OutputWriter = OutputWriter()
-    private var jsonData: NSDictionary
+
+    private var jsonData: Dictionary<String, AnyObject>!
+    static var sharedInstance: OutputWriter = OutputWriter()
     
     private init()
     {
-        jsonData = NSDictionary()
+        
     }
     
     var data: NSObject!
     var children:NSMutableArray!
+    var content: Dictionary<String, AnyObject>!;
+    var objectData: Dictionary<String, AnyObject>!
     
-    func addHeader()
+    func startPublish()
     {
-        jsonData.setValue("a2ee0952-26b5-49ae-8bf9-4f1d6279b798", forKey: "ID")
-        jsonData.setValue("3.10.0.0", forKey: "Version")
-        jsonData.setValue("MainScene", forKey: "Name")
+        jsonData = Dictionary<String, AnyObject>()
+        addHeader()
+    }
+    
+    func endPublish()
+    {
+        objectData.updateValue(children as AnyObject, forKey: "Children")
+        content.updateValue(objectData as AnyObject, forKey: "ObjectData")
+        jsonData.updateValue(content as AnyObject, forKey: "Content")
+    }
+    
+    private func addHeader()
+    {
+        jsonData.updateValue("1.0" as AnyObject, forKey: "Version")
         
-        //add head content
-        let hcontent:NSDictionary = NSDictionary()
-        jsonData.setValue(hcontent, forKey: "Content")
+        //TODO : get this from filename
+        jsonData.updateValue("MainScene" as AnyObject, forKey: "Name")
         
         //add child content
-        let content:NSDictionary = NSDictionary()
-        hcontent.setValue(content, forKey: "Content")
-        
-        //add animation
-        let animation:NSDictionary = NSDictionary()
-        content.setValue(animation, forKey: "Animation")
-        animation.setValue(0, forKey: "Duration")
-        animation.setValue(1, forKey: "Speed")
-        animation.setValue(NSArray(), forKey: "Timelines")
-        animation.setValue("TimelineActionData", forKey: "ctype")
-        
-        //add animation list
-        content.setValue(NSArray(), forKey: "AnimationList")
+        content = Dictionary<String, AnyObject>()
         
         //add object data
-        let objectData:NSDictionary = NSDictionary()
-        content.setValue(objectData, forKey: "ObjectData")
+        objectData = Dictionary<String, AnyObject>()
         
         //add children
         children = NSMutableArray()
-        objectData.setValue(children, forKey: "Children")
         
         //add resolution size
-        let size: NSDictionary = NSDictionary()
-        size.setValue(960, forKey: "X")
-        size.setValue(640, forKey: "Y")
-        objectData.setValue(size, forKey: "Size")
+        var size: Dictionary<String, AnyObject> = Dictionary<String, AnyObject>()
         
-        objectData.setValue("Scene", forKey: "Name")
+        //TODO : get this from document
+        size.updateValue(960 as AnyObject, forKey: "ResX")
+        size.updateValue(640 as AnyObject, forKey: "ResY")
+        objectData.updateValue(size as AnyObject, forKey: "ResolutionSize")
+        
+        objectData.updateValue("Scene" as AnyObject, forKey: "Name")
         
         //add ctype
-        objectData.setValue("SingleNodeObjectData", forKey: "ctype")
+        objectData.updateValue("SingleNodeObjectData" as AnyObject, forKey: "ctype")
         
         //add used resources
         let usedResources: NSMutableArray = NSMutableArray()
-        content.setValue(usedResources, forKey: "UsedResources")
+        content.updateValue(usedResources as AnyObject, forKey: "UsedResources")
         
         //add ctype
-        content.setValue("GameFileData", forKey: "ctype")
+        content.updateValue("GameFileData" as AnyObject, forKey: "ctype")
         
         //add scene type
-        jsonData.setValue("Scene", forKey: "Type")
+        jsonData.updateValue("Scene" as AnyObject, forKey: "Type")
+        
+        jsonData.updateValue(content as AnyObject, forKey: "Content")
     }
     
     func addImageView(view: NSImageView)
     {
-        let spriteData: NSDictionary = NSDictionary()
+        var spriteData: Dictionary<String, AnyObject> = Dictionary<String, AnyObject>()
         
         //add FileData
-        let fileData: NSDictionary = NSDictionary()
-        fileData.setValue("Normal", forKey: "Type")
-        fileData.setValue("", forKey: OutputKeys.Path)
-        fileData.setValue("", forKey: OutputKeys.Plist)
-        children.setValue(fileData, forKey: OutputKeys.FileData)
+        var fileData: Dictionary<String, AnyObject> = Dictionary<String, AnyObject>()
+        fileData.updateValue("Normal" as AnyObject, forKey: "Type")
         
+        //TODO get this info from image
+        //
+        fileData.updateValue("" as AnyObject, forKey: OutputKeys.Path)
+        spriteData.updateValue(fileData as AnyObject, forKey: OutputKeys.FileData)
         
+        //add position
+        var position:Dictionary<String, AnyObject> = Dictionary<String, AnyObject>()
+        position.updateValue(view.frame.midX as AnyObject, forKey: "X")
+        position.updateValue(view.frame.midY as AnyObject, forKey: "Y")
+        spriteData.updateValue(position as AnyObject, forKey: "Position")
+        
+        self.children.add(spriteData)
+    }
+    
+    func getDataToSave()->Data?
+    {
+        var data: Data?;
+        do
+        {
+            data = try JSONSerialization.data(withJSONObject: jsonData, options: .prettyPrinted)
+        }
+        catch
+        {
+            print(error.localizedDescription)
+        }
+        
+        return data
     }
 }
