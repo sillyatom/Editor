@@ -26,6 +26,8 @@ class MainSceneView: NSView
     
     override func awakeFromNib()
     {
+        self.wantsLayer = true
+        
         //set content size
         self.frame = NSRect(x: 0.0, y: 0.0, width: 960.0, height: 640.0)
     
@@ -160,5 +162,52 @@ class MainSceneView: NSView
             path.lineWidth = Appearance.lineWidth
             path.stroke()
         }
+    }
+    
+    
+    //For selection /
+    
+    var startPoint : NSPoint!
+    var shapeLayer : CAShapeLayer!
+    
+    override func mouseDown(with event: NSEvent)
+    {
+        
+        self.startPoint = self.convert(event.locationInWindow, from: nil)
+        
+        shapeLayer = CAShapeLayer()
+        shapeLayer.lineWidth = 1.0
+        shapeLayer.fillColor = NSColor.clear.cgColor
+        shapeLayer.strokeColor = NSColor.black.cgColor
+        shapeLayer.lineDashPattern = [10,5]
+        self.layer?.addSublayer(shapeLayer)
+        
+        var dashAnimation = CABasicAnimation()
+        dashAnimation = CABasicAnimation(keyPath: "lineDashPhase")
+        dashAnimation.duration = 0.75
+        dashAnimation.fromValue = 0.0
+        dashAnimation.toValue = 15.0
+        dashAnimation.repeatCount = .infinity
+        shapeLayer.add(dashAnimation, forKey: "linePhase")
+        
+    }
+    
+    override func mouseDragged(with event: NSEvent)
+    {
+        
+        let point : NSPoint = self.convert(event.locationInWindow, from: nil)
+        let path = CGMutablePath()
+        path.move(to: self.startPoint)
+        path.addLine(to: NSPoint(x: self.startPoint.x, y: point.y))
+        path.addLine(to: point)
+        path.addLine(to: NSPoint(x:point.x,y:self.startPoint.y))
+        path.closeSubpath()
+        self.shapeLayer.path = path
+    }
+    
+    override func mouseUp(with event: NSEvent)
+    {
+        self.shapeLayer.removeFromSuperlayer()
+        self.shapeLayer = nil
     }
 }
