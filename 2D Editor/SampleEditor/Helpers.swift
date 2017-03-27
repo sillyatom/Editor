@@ -35,6 +35,19 @@ extension NSView
     let image = NSImage(data: pdfData)
     return image ?? NSImage()
   }
+    
+  func hasObjectUnderPosition(point: CGPoint)->Bool
+  {
+        for child in subviews
+        {
+            if child.frame.contains(point)
+            {
+                return true
+            }
+        }
+    
+        return false
+  }
 }
 
 extension NSPoint

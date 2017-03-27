@@ -26,39 +26,78 @@ enum Appearance
 class MainVC: NSViewController
 {
     @IBOutlet var topLayer: MainSceneView!
-    var offPoint: NSPoint!
+    var isDragging: Bool = false
     
     override func viewDidLoad()
     {
         super.viewDidLoad()
         topLayer.delegate = self
-        offPoint = NSPoint()
     }
     
     override func mouseDown(with event: NSEvent)
     {
-        topLayer.checkForHighlights(mouseLocation: CGPoint(x: event.locationInWindow.x, y: event.locationInWindow.y))
-        
-        if let selectedChild = topLayer.currentSelection
+        let screenPoint: NSPoint = NSPoint(x: event.locationInWindow.x, y: event.locationInWindow.y)
+        if !topLayer.hasObjectUnderPosition(point: screenPoint)
         {
-            let screenPoint: NSPoint = NSPoint(x: event.locationInWindow.x, y: event.locationInWindow.y);
-            offPoint = self.view.convert(screenPoint, to: selectedChild)
+            topLayer.checkForHighlights(mouseLocation: nil)
+        }
+        else
+        {
+            if topLayer.currentSelection.count == 0
+            {
+                topLayer.checkForHighlights(mouseLocation: CGPoint(x: event.locationInWindow.x, y: event.locationInWindow.y))
+            }
+        }
+        
+        if topLayer.currentSelection.count != 0
+        {
+            for child in topLayer.currentSelection
+            {
+                let selectedChild = (child as? SelectedEditorObject)!
+                let screenPoint: NSPoint = NSPoint(x: event.locationInWindow.x, y: event.locationInWindow.y)
+                selectedChild.offPoint = self.view.convert(screenPoint, to: selectedChild.editorObj.getView())
+            }
+        }
+        else
+        {
+            topLayer.startSelection(with: event)
         }
     }
     
     override func mouseUp(with event: NSEvent)
     {
-        topLayer.checkForHighlights(mouseLocation: nil)
+        if isDragging
+        {
+            topLayer.endSelection(with: event)
+        }
+        else
+        {
+            let screenPoint: NSPoint = NSPoint(x: event.locationInWindow.x, y: event.locationInWindow.y)
+            if !topLayer.hasObjectUnderPosition(point: screenPoint)
+            {
+                topLayer.checkForHighlights(mouseLocation: nil)
+            }
+        }
+        isDragging = false
     }
 
     override func mouseDragged(with event: NSEvent)
     {
-        if let selectedChild = topLayer.currentSelection
+        isDragging = true
+        if topLayer.currentSelection.count != 0
         {
-            let screenPoint: NSPoint = NSPoint(x: event.locationInWindow.x, y: event.locationInWindow.y);
-            let calcPoint: NSPoint = NSPoint(x: screenPoint.x - offPoint.x,
-                                             y: screenPoint.y - offPoint.y)
-            selectedChild.setFrameOrigin(calcPoint)
+            for child in topLayer.currentSelection
+            {
+                let selectedChild = (child as? SelectedEditorObject)!
+                let screenPoint: NSPoint = NSPoint(x: event.locationInWindow.x, y: event.locationInWindow.y);
+                let calcPoint: NSPoint = NSPoint(x: screenPoint.x - selectedChild.offPoint.x,
+                                                 y: screenPoint.y - selectedChild.offPoint.y)
+                selectedChild.editorObj.getView().setFrameOrigin(calcPoint)
+            }
+        }
+        else
+        {
+            topLayer.dragSelection(with: event)
         }
     }
 }

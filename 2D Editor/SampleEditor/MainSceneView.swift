@@ -22,7 +22,7 @@ class MainSceneView: NSView
     var acceptableTypes: Set<String> { return nonURLTypes.union([NSURLPboardType]) }
     
     var delegate: DestinationViewDelegate?
-    var currentSelection: NSView!
+    var currentSelection: NSMutableArray!
     
     override func awakeFromNib()
     {
@@ -33,6 +33,8 @@ class MainSceneView: NSView
     
         //register for file types
         self.register(forDraggedTypes: Array(acceptableTypes))
+        
+        currentSelection = NSMutableArray()
     }
     
     let filteringOptions = [NSPasteboardURLReadingContentsConformToTypesKey:NSImage.imageTypes()]
@@ -122,13 +124,17 @@ class MainSceneView: NSView
     {
         if let point = mouseLocation
         {
+            currentSelection.removeAllObjects()
             for child in subviews
             {
                 if child.frame.contains(point)
                 {
-                    let img: ExtImageView = child as! ExtImageView
-                    img.isHighlighted = true
-                    currentSelection = child
+                    if child is EditorObject
+                    {
+                        var img: EditorObject = child as! EditorObject
+                        img.isHighlighted = true
+                        currentSelection.add(SelectedEditorObject(pObj: img, pOffPt: nil))
+                    }
                     break
                 }
                 else
@@ -145,7 +151,7 @@ class MainSceneView: NSView
                 let img: ExtImageView = child as! ExtImageView
                 img.isHighlighted = false
             }
-            currentSelection = nil
+            currentSelection.removeAllObjects()
         }
     }
     
@@ -169,10 +175,10 @@ class MainSceneView: NSView
     
     var startPoint : NSPoint!
     var shapeLayer : CAShapeLayer!
+    var shapeRect : NSRect!
     
-    override func mouseDown(with event: NSEvent)
+    func startSelection(with event: NSEvent)
     {
-        
         self.startPoint = self.convert(event.locationInWindow, from: nil)
         
         shapeLayer = CAShapeLayer()
@@ -192,7 +198,7 @@ class MainSceneView: NSView
         
     }
     
-    override func mouseDragged(with event: NSEvent)
+    func dragSelection(with event: NSEvent)
     {
         
         let point : NSPoint = self.convert(event.locationInWindow, from: nil)
@@ -203,11 +209,40 @@ class MainSceneView: NSView
         path.addLine(to: NSPoint(x:point.x,y:self.startPoint.y))
         path.closeSubpath()
         self.shapeLayer.path = path
+        
+        self.shapeRect = NSRect.init(x: self.startPoint.x, y: self.startPoint.y, width: point.x - self.startPoint.x, height: point.y - self.startPoint.y)
     }
     
-    override func mouseUp(with event: NSEvent)
+    func endSelection(with event: NSEvent)
     {
-        self.shapeLayer.removeFromSuperlayer()
+        if let rect = self.shapeRect
+        {
+            currentSelection.removeAllObjects()
+            for child in subviews
+            {
+                if rect.intersects(child.frame)
+                {
+                    if child is EditorObject
+                    {
+                        var img: EditorObject = child as! EditorObject
+                        img.isHighlighted = true
+                        currentSelection.add(SelectedEditorObject(pObj: img, pOffPt: nil))
+                    }
+                    else
+                    {
+                        var img: EditorObject = child as! EditorObject
+                        img.isHighlighted = false
+                    }
+                }
+            }
+        }
+        
+        if let shape = self.shapeLayer
+        {
+            shape.removeFromSuperlayer()
+        }
+        
         self.shapeLayer = nil
+        self.shapeRect = nil
     }
 }

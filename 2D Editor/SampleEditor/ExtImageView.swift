@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class ExtImageView: NSImageView
+class ExtImageView: NSImageView, EditorObject
 {
     private var _highlighted:Bool = false
     override var isHighlighted:Bool
@@ -25,6 +25,11 @@ class ExtImageView: NSImageView
         
     }
     
+    func getView() -> NSView
+    {
+        return self as NSView
+    }
+    
     override func draw(_ dirtyRect: NSRect)
     {
         // Drawing code here.
@@ -34,13 +39,13 @@ class ExtImageView: NSImageView
         {
             super.draw(dirtyRect)
             
-            layer?.borderWidth = 4.0
+            layer?.borderWidth = 2.0
             layer?.cornerRadius = 8.0
             layer?.masksToBounds = true
-            layer?.opacity = 0.25
+            layer?.opacity = 0.5
             
             NSColor.red.set()
-            NSBezierPath.setDefaultLineWidth(4.0)
+            NSBezierPath.setDefaultLineWidth(2.0)
             NSBezierPath.stroke(frame)
         }
         else
