@@ -129,18 +129,14 @@ class MainSceneView: NSView
             {
                 if child.frame.contains(point)
                 {
-                    if child is EditorObject
-                    {
-                        var img: EditorObject = child as! EditorObject
-                        img.isHighlighted = true
-                        currentSelection.add(SelectedEditorObject(pObj: img, pOffPt: nil))
-                    }
-                    break
+                    var obj: EditorObject = child as! EditorObject
+                    obj.isHighlighted = true
+                    currentSelection.add(SelectedEditorObject(pObj: obj, pOffPt: nil))
                 }
                 else
                 {
-                    let img: ExtImageView = child as! ExtImageView
-                    img.isHighlighted = false
+                    var obj: EditorObject = child as! EditorObject
+                    obj.isHighlighted = false
                 }
             }
         }
@@ -148,8 +144,8 @@ class MainSceneView: NSView
         {
             for child in subviews
             {
-                let img: ExtImageView = child as! ExtImageView
-                img.isHighlighted = false
+                var obj: EditorObject = child as! EditorObject
+                obj.isHighlighted = false
             }
             currentSelection.removeAllObjects()
         }

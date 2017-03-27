@@ -37,18 +37,25 @@ class MainVC: NSViewController
     override func mouseDown(with event: NSEvent)
     {
         let screenPoint: NSPoint = NSPoint(x: event.locationInWindow.x, y: event.locationInWindow.y)
+        
+        //if there are no objects under click location
         if !topLayer.hasObjectUnderPosition(point: screenPoint)
         {
+            //unhighlight all
             topLayer.checkForHighlights(mouseLocation: nil)
         }
         else
         {
-            if topLayer.currentSelection.count == 0
+            //if there is some object under click position
+            //and if there is one object or none selected then update the highlight
+            //if current selection count is less than or equals ONE then update highlight
+            if topLayer.currentSelection.count <= 1
             {
                 topLayer.checkForHighlights(mouseLocation: CGPoint(x: event.locationInWindow.x, y: event.locationInWindow.y))
             }
         }
         
+        //if current selection is more than zero, update the offPoint for dragging
         if topLayer.currentSelection.count != 0
         {
             for child in topLayer.currentSelection
@@ -58,6 +65,7 @@ class MainVC: NSViewController
                 selectedChild.offPoint = self.view.convert(screenPoint, to: selectedChild.editorObj.getView())
             }
         }
+        //if current selection is zero start drag selection
         else
         {
             topLayer.startSelection(with: event)
@@ -66,10 +74,12 @@ class MainVC: NSViewController
     
     override func mouseUp(with event: NSEvent)
     {
+        //if dragging end the drag session
         if isDragging
         {
             topLayer.endSelection(with: event)
         }
+        //if there are no objects under mouse click location uncheck the highlights
         else
         {
             let screenPoint: NSPoint = NSPoint(x: event.locationInWindow.x, y: event.locationInWindow.y)
@@ -84,6 +94,8 @@ class MainVC: NSViewController
     override func mouseDragged(with event: NSEvent)
     {
         isDragging = true
+        
+        //drag multiple objects
         if topLayer.currentSelection.count != 0
         {
             for child in topLayer.currentSelection
@@ -97,6 +109,7 @@ class MainVC: NSViewController
         }
         else
         {
+            //update drag selection
             topLayer.dragSelection(with: event)
         }
     }
