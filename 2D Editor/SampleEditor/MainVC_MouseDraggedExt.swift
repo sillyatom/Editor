@@ -79,7 +79,15 @@ extension MainVC
         
         let selectedChild: SelectedEditorObject = (topLayer.currentSelection.object(at: 0) as! SelectedEditorObject)
         let currentSelection: NSView = selectedChild.editorObj as! NSView
-        for child in topLayer.subviews
+        let currentPosition: NSPoint = NSPoint(x: currentSelection.frame.midX, y: currentSelection.frame.midY)
+        
+        var childs: [NSView] = topLayer.subviews
+        childs.sort{
+            (view1: NSView, view2: NSView)->Bool in
+                    return Helper.distance(point1: currentPosition, point2: NSPoint(x: view1.frame.midX, y: view1.frame.midY)) < Helper.distance(point1: currentPosition, point2: NSPoint(x: view2.frame.midX, y: view2.frame.midY))
+        }
+        
+        for child in childs
         {
             if child is EditorObject == false
             {
@@ -127,6 +135,38 @@ extension MainVC
                 currentSelection.frame = NSRect(x: currentSelection.frame.minX, y: child.frame.minY, width: currentSelection.frame.width, height: currentSelection.frame.height)
             }
             
+            //for top(child) - bottom(selection) guide
+            distance = Helper.distance(point1: currentSelection.frame.minY, point2: child.frame.maxY)
+            distance = abs(distance)
+            if distance <= 50
+            {
+                drawGuideOnTop(for: child, target: currentSelection)
+            }
+            else
+            {
+                removeGuideOnTop(for: child, target: currentSelection)
+            }
+            if distance <= 10
+            {
+                currentSelection.frame = NSRect(x: currentSelection.frame.minX, y: child.frame.maxY, width: currentSelection.frame.width, height: currentSelection.frame.height)
+            }
+            
+            //for bottom(child) - top guide(selection)
+            distance = Helper.distance(point1: currentSelection.frame.maxY, point2: child.frame.minY)
+            distance = abs(distance)
+            if distance <= 50
+            {
+                drawGuideOnBottom(for: child, target: currentSelection)
+            }
+            else
+            {
+                removeGuideOnBottom(for: child, target: currentSelection)
+            }
+            if distance <= 10
+            {
+                currentSelection.frame = NSRect(x: currentSelection.frame.minX, y: child.frame.minY - currentSelection.frame.height, width: currentSelection.frame.width, height: currentSelection.frame.height)
+            }
+
             //for left guide
             distance = Helper.distance(point1: currentSelection.frame.minX, point2: child.frame.minX)
             distance = abs(distance)
