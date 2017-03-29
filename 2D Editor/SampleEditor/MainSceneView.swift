@@ -20,7 +20,7 @@ class MainSceneView: NSView
     var nonURLTypes: Set<String>  { return [String(kUTTypeTIFF), String(kUTTypeJPEG), String(kUTTypePNG)] }
 
     var acceptableTypes: Set<String> { return nonURLTypes.union([NSURLPboardType]) }
-    var guides: Dictionary<NSView, AnyObject>!
+    var guides: Dictionary<NSView, NSMutableArray>!
     var delegate: DestinationViewDelegate?
     var currentSelection: NSMutableArray!
     
@@ -28,7 +28,7 @@ class MainSceneView: NSView
     {
         self.wantsLayer = true
         
-        guides = Dictionary<NSView, AnyObject>()
+        guides = Dictionary<NSView, NSMutableArray>()
         
         //set content size
         self.frame = NSRect(x: 0.0, y: 0.0, width: 960.0, height: 640.0)
@@ -194,16 +194,23 @@ class MainSceneView: NSView
                     return false
                 }
             }
-            let path = value as! NSBezierPath
-            if isActive
+            let paths = value
+            for item in paths
             {
-                NSColor.clear.set()
+                if item is NSBezierPath
+                {
+                    let path = item as! NSBezierPath
+                    if isActive
+                    {
+                        NSColor.clear.set()
+                    }
+                    else
+                    {
+                        NSColor.blue.set()
+                    }
+                    path.stroke()
+                }
             }
-            else
-            {
-                NSColor.blue.set()
-            }
-            path.stroke()
         }
     }
     

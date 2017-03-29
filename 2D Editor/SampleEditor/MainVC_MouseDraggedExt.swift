@@ -94,10 +94,35 @@ extension MainVC
                 continue;
             }
             
-            drawGuideOnTop(for: child, target: currentSelection)
-            
-            var distance = Helper.distance(point1: currentSelection.frame.midY, point2: child.frame.midY)
+            //for top guide
+            var distance = Helper.distance(point1: currentSelection.frame.maxY, point2: child.frame.maxY)
             distance = abs(distance)
+            
+            if distance <= 50
+            {
+                drawGuideOnTop(for: child, target: currentSelection)
+            }
+            else
+            {
+                removeGuideOnTop(for: child, target: currentSelection)
+            }
+            if distance <= 10
+            {
+                currentSelection.frame = NSRect(x: currentSelection.frame.minX, y: child.frame.minY, width: currentSelection.frame.width, height: currentSelection.frame.height)
+            }
+            
+            //for bottom guide
+            distance = Helper.distance(point1: currentSelection.frame.minY, point2: child.frame.minY)
+            distance = abs(distance)
+            
+            if distance <= 50
+            {
+                drawGuideOnBottom(for: child, target: currentSelection)
+            }
+            else
+            {
+                removeGuideOnBottom(for: child, target: currentSelection)
+            }
             if distance <= 10
             {
                 currentSelection.frame = NSRect(x: currentSelection.frame.minX, y: child.frame.minY, width: currentSelection.frame.width, height: currentSelection.frame.height)
