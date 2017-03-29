@@ -30,6 +30,8 @@ extension MainVC
             path.move(to: NSPoint(x: child.frame.midX, y: child.frame.maxY))
             path.line(to: NSPoint(x: target.frame.midX, y: child.frame.maxY))
         }
+        
+        path.setLineDash([15.0, 15.0], count: 2, phase: 0)
         view.guides.updateValue(path, forKey: child)
         self.view.needsDisplay = true
     }

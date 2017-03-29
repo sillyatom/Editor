@@ -28,5 +28,7 @@ extension MainVC
             }
         }
         isDragging = false
+        
+        self.view.needsDisplay = true
     }
 }

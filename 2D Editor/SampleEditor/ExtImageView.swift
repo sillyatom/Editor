@@ -52,7 +52,7 @@ class ExtImageView: NSImageView, EditorObject
         {
             super.draw(dirtyRect)
             
-            layer?.opacity = 0.75
+            layer?.opacity = 0.5
         }
         else
         {

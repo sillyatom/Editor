@@ -70,6 +70,8 @@ class MainVC: NSViewController
         //update guides
         //
         //
+        
+//        self.view.needsDisplay = true
     }
     
     override func mouseDragged(with event: NSEvent)

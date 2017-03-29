@@ -177,14 +177,22 @@ class MainSceneView: NSView
             path.lineWidth = Appearance.lineWidth
             path.stroke()
         }
+        
         for (key, value) in guides
         {
-            let isActive = currentSelection.contains{ element in
-                if let obj: SelectedEditorObject = element as? SelectedEditorObject
-                {
-                    return obj.editorObj.getView() == key
+            var isActive: Bool = false
+            
+            isActive = currentSelection.count == 0 ? true : false
+            
+            if !isActive
+            {
+                isActive = currentSelection.contains{ element in
+                    if let obj: SelectedEditorObject = element as? SelectedEditorObject
+                    {
+                        return obj.editorObj.getView() == key
+                    }
+                    return false
                 }
-                return false
             }
             let path = value as! NSBezierPath
             if isActive
@@ -229,7 +237,6 @@ class MainSceneView: NSView
     
     func dragSelection(with event: NSEvent)
     {
-        
         let point : NSPoint = self.convert(event.locationInWindow, from: nil)
         let path = CGMutablePath()
         path.move(to: self.startPoint)
