@@ -19,13 +19,11 @@ enum GuideSides
 
 extension MainVC
 {
-    func drawGuideOnTop(for child: NSView, target: NSView)
+    
+    private func initPaths(for child: NSView)
     {
         let view = self.view as! MainSceneView
         let keyExists = view.guides[child] != nil
-        
-        var path:NSBezierPath!
-        
         if !keyExists
         {
             view.guides[child] = NSMutableArray()
@@ -38,14 +36,18 @@ extension MainVC
                 view.guides[child]?.add(newPath)
             }
         }
-        
+    }
+    func drawGuideOnTop(for child: NSView, target: NSView)
+    {
+        initPaths(for: child)
+        let view = self.view as! MainSceneView
+        var path:NSBezierPath!
         path = view.guides[child]?[GuideSides.top] as! NSBezierPath
         path.removeAllPoints()
         path.move(to: NSPoint(x: child.frame.midX, y: child.frame.maxY))
         path.line(to: NSPoint(x: target.frame.midX, y: child.frame.maxY))
         
         view.guides[child]?[GuideSides.top] = path
-        self.view.needsDisplay = true
     }
     
     func removeGuideOnTop(for child: NSView, target: NSView)
@@ -62,37 +64,19 @@ extension MainVC
                 view.guides[child]?[GuideSides.top] = path
             }
         }
-        
-        self.view.needsDisplay = true
     }
     
     func drawGuideOnBottom(for child: NSView, target: NSView)
     {
+        initPaths(for: child)
         let view = self.view as! MainSceneView
-        let keyExists = view.guides[child] != nil
-        
         var path:NSBezierPath!
-        
-        if !keyExists
-        {
-            view.guides[child] = NSMutableArray()
-            
-            for _ in 0...3
-            {
-                let newPath = NSBezierPath()
-                newPath.lineWidth = 1
-                newPath.setLineDash([15.0, 15.0], count: 2, phase: 0)
-                view.guides[child]?.add(newPath)
-            }
-        }
-        
         path = view.guides[child]?[GuideSides.bottom] as! NSBezierPath
         path.removeAllPoints()
         path.move(to: NSPoint(x: child.frame.midX, y: child.frame.minY))
         path.line(to: NSPoint(x: target.frame.midX, y: child.frame.minY))
         
         view.guides[child]?[GuideSides.bottom] = path
-        self.view.needsDisplay = true
     }
     
     func removeGuideOnBottom(for child: NSView, target: NSView)
@@ -109,22 +93,63 @@ extension MainVC
                 view.guides[child]?[GuideSides.bottom] = path
             }
         }
-        
-        self.view.needsDisplay = true
     }
     
-    func drawGuideOnLeft()
+    func drawGuideOnLeft(for child: NSView, target: NSView)
     {
+        initPaths(for: child)
+        let view = self.view as! MainSceneView
+        var path:NSBezierPath!
+        path = view.guides[child]?[GuideSides.left] as! NSBezierPath
+        path.removeAllPoints()
+        path.move(to: NSPoint(x: child.frame.minX, y: child.frame.midY))
+        path.line(to: NSPoint(x: child.frame.minX, y: target.frame.midY))
         
+        view.guides[child]?[GuideSides.left] = path
     }
     
-    func drawGuideOnRight()
+    func removeGuideOnLeft(for child: NSView, target: NSView)
     {
-        
+        let view = self.view as! MainSceneView
+        let keyExists = view.guides[child] != nil
+        var path:NSBezierPath!
+        if keyExists
+        {
+            if (view.guides[child]?[GuideSides.left]) != nil
+            {
+                path = view.guides[child]?[GuideSides.left] as! NSBezierPath
+                path.removeAllPoints()
+                view.guides[child]?[GuideSides.left] = path
+            }
+        }
     }
     
-    func removeallGuides()
+    func drawGuideOnRight(for child: NSView, target: NSView)
     {
+        initPaths(for: child)
+        let view = self.view as! MainSceneView
+        var path:NSBezierPath!
+        path = view.guides[child]?[GuideSides.right] as! NSBezierPath
+        path.removeAllPoints()
+        path.move(to: NSPoint(x: child.frame.maxX, y: child.frame.midY))
+        path.line(to: NSPoint(x: child.frame.maxX, y: target.frame.midY))
         
+        view.guides[child]?[GuideSides.right] = path
+    }
+    
+    func removeGuideOnRight(for child: NSView, target: NSView)
+    {
+        let view = self.view as! MainSceneView
+        let keyExists = view.guides[child] != nil
+        var path:NSBezierPath!
+        if keyExists
+        {
+            if (view.guides[child]?[GuideSides.right]) != nil
+            {
+                path = view.guides[child]?[GuideSides.right] as! NSBezierPath
+                path.removeAllPoints()
+                view.guides[child]?[GuideSides.right] = path
+            }
+        }
     }
 }

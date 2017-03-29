@@ -65,6 +65,6 @@ class ExtImageView: NSImageView, EditorObject
     
     func updateSelectionView()
     {
-        selectionView?.setFrameOrigin(NSPoint(x: self.frame.minX, y: self.frame.maxY))
+        selectionView?.setFrameOrigin(NSPoint(x: self.frame.midX - ((selectionView?.frame.width)!*0.5), y: self.frame.maxY))
     }
 }

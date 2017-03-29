@@ -77,7 +77,8 @@ extension MainVC
             return
         }
         
-        let currentSelection: NSView = (topLayer.currentSelection.object(at: 0) as! SelectedEditorObject).editorObj as! NSView
+        let selectedChild: SelectedEditorObject = (topLayer.currentSelection.object(at: 0) as! SelectedEditorObject)
+        let currentSelection: NSView = selectedChild.editorObj as! NSView
         for child in topLayer.subviews
         {
             if child is EditorObject == false
@@ -97,7 +98,6 @@ extension MainVC
             //for top guide
             var distance = Helper.distance(point1: currentSelection.frame.maxY, point2: child.frame.maxY)
             distance = abs(distance)
-            
             if distance <= 50
             {
                 drawGuideOnTop(for: child, target: currentSelection)
@@ -114,7 +114,6 @@ extension MainVC
             //for bottom guide
             distance = Helper.distance(point1: currentSelection.frame.minY, point2: child.frame.minY)
             distance = abs(distance)
-            
             if distance <= 50
             {
                 drawGuideOnBottom(for: child, target: currentSelection)
@@ -127,6 +126,45 @@ extension MainVC
             {
                 currentSelection.frame = NSRect(x: currentSelection.frame.minX, y: child.frame.minY, width: currentSelection.frame.width, height: currentSelection.frame.height)
             }
+            
+            //for left guide
+            distance = Helper.distance(point1: currentSelection.frame.minX, point2: child.frame.minX)
+            distance = abs(distance)
+            if distance <= 50
+            {
+                drawGuideOnLeft(for: child, target: currentSelection)
+            }
+            else
+            {
+                removeGuideOnLeft(for: child, target: currentSelection)
+            }
+            if distance <= 10
+            {
+                currentSelection.frame = NSRect(x: child.frame.minX, y: currentSelection.frame.minY, width: currentSelection.frame.width, height: currentSelection.frame.height)
+            }
+            
+            //for right guide
+            distance = Helper.distance(point1: currentSelection.frame.maxX, point2: child.frame.maxX)
+            distance = abs(distance)
+            if distance <= 50
+            {
+                drawGuideOnRight(for: child, target: currentSelection)
+            }
+            else
+            {
+                removeGuideOnRight(for: child, target: currentSelection)
+            }
+            if distance <= 10
+            {
+                currentSelection.frame = NSRect(x: child.frame.minX, y: currentSelection.frame.minY, width: currentSelection.frame.width, height: currentSelection.frame.height)
+            }
+            
+            selectedChild.editorObj.updateSelectionView()
+        }
+        
+        if topLayer.getEditorObjChildcount() > 1
+        {
+            self.view.needsDisplay = true
         }
     }
 }

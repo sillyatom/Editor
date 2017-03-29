@@ -27,6 +27,8 @@ extension MainVC: DestinationViewDelegate
         selectionView.isHidden = true
         subview.selectionView = selectionView
         
+        subview.updateSelectionView()
+        
         //4.
         //        let maxrotation = CGFloat(arc4random_uniform(Appearance.maxRotation)) - Appearance.rotationOffset
         //        subview.frameCenterRotation = maxrotation
