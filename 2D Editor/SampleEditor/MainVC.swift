@@ -84,7 +84,7 @@ class MainVC: NSViewController
         checkSelectionOnMouseDragged(with: event)
         
         //update guides
-        if topLayer.subviews.count > 1
+        if topLayer.getEditorObjChildcount() > 1
         {
             updateGuidesOnMouseDragged(with: event)
         }

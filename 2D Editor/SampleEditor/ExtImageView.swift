@@ -20,9 +20,22 @@ class ExtImageView: NSImageView, EditorObject
         set
         {
             _highlighted = newValue
+            selectionView?.isHidden = !newValue
             self.needsDisplay = true
         }
-        
+    }
+    
+    private var _selectionView: NSView?
+    var selectionView: NSView?
+    {
+        get
+        {
+            return _selectionView
+        }
+        set
+        {
+            _selectionView = newValue
+        }
     }
     
     func getView() -> NSView
@@ -48,5 +61,10 @@ class ExtImageView: NSImageView, EditorObject
             NSBezierPath.fill(dirtyRect)
             super.draw(dirtyRect)
         }
+    }
+    
+    func updateSelectionView()
+    {
+        selectionView?.setFrameOrigin(NSPoint(x: self.frame.minX, y: self.frame.maxY))
     }
 }

@@ -60,6 +60,7 @@ extension MainVC
                 let calcPoint: NSPoint = NSPoint(x: screenPoint.x - selectedChild.offPoint.x,
                                                  y: screenPoint.y - selectedChild.offPoint.y)
                 selectedChild.editorObj.getView().setFrameOrigin(calcPoint)
+                selectedChild.editorObj.updateSelectionView()
             }
         }
         else
@@ -71,9 +72,18 @@ extension MainVC
     
     func updateGuidesOnMouseDragged(with event: NSEvent)
     {
+        if topLayer.currentSelection.count == 0
+        {
+            return
+        }
+        
         let currentSelection: NSView = (topLayer.currentSelection.object(at: 0) as! SelectedEditorObject).editorObj as! NSView
         for child in topLayer.subviews
         {
+            if child is EditorObject == false
+            {
+                continue
+            }
             if child != currentSelection
             {
                 

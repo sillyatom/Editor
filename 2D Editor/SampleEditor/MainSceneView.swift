@@ -129,10 +129,16 @@ class MainSceneView: NSView
             currentSelection.removeAllObjects()
             for child in subviews
             {
+                if child is EditorObject == false
+                {
+                    continue
+                }
+                
                 if child.frame.contains(point)
                 {
                     var obj: EditorObject = child as! EditorObject
                     obj.isHighlighted = true
+                    
                     currentSelection.add(SelectedEditorObject(pObj: obj, pOffPt: nil))
                 }
                 else
@@ -146,6 +152,11 @@ class MainSceneView: NSView
         {
             for child in subviews
             {
+                if child is EditorObject == false
+                {
+                    continue
+                }
+                
                 var obj: EditorObject = child as! EditorObject
                 obj.isHighlighted = false
             }
@@ -166,11 +177,24 @@ class MainSceneView: NSView
             path.lineWidth = Appearance.lineWidth
             path.stroke()
         }
-        
-        for (_, value) in guides
+        for (key, value) in guides
         {
+            let isActive = currentSelection.contains{ element in
+                if let obj: SelectedEditorObject = element as? SelectedEditorObject
+                {
+                    return obj.editorObj.getView() == key
+                }
+                return false
+            }
             let path = value as! NSBezierPath
-            NSColor.blue.set()
+            if isActive
+            {
+                NSColor.clear.set()
+            }
+            else
+            {
+                NSColor.blue.set()
+            }
             path.stroke()
         }
     }
@@ -225,12 +249,17 @@ class MainSceneView: NSView
             currentSelection.removeAllObjects()
             for child in subviews
             {
+                if child is EditorObject == false
+                {
+                    continue
+                }
                 if rect.intersects(child.frame)
                 {
                     if child is EditorObject
                     {
                         var img: EditorObject = child as! EditorObject
                         img.isHighlighted = true
+                        
                         currentSelection.add(SelectedEditorObject(pObj: img, pOffPt: nil))
                     }
                     else
@@ -249,5 +278,18 @@ class MainSceneView: NSView
         
         self.shapeLayer = nil
         self.shapeRect = nil
+    }
+    
+    func getEditorObjChildcount()->Int
+    {
+        var count:Int = 0
+        for child in subviews
+        {
+            if child is EditorObject
+            {
+                count += 1
+            }
+        }
+        return count
     }
 }

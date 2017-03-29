@@ -21,6 +21,12 @@ extension MainVC: DestinationViewDelegate
         subview.image = image
         view.addSubview(subview)
         
+        let selectionView:NSView = Helper.loadViewFromNib(name: "SelectionView")!
+        view.addSubview(selectionView)
+        selectionView.setFrameOrigin(NSPoint(x: subview.frame.minX, y: subview.frame.maxY))
+        selectionView.isHidden = true
+        subview.selectionView = selectionView
+        
         //4.
         //        let maxrotation = CGFloat(arc4random_uniform(Appearance.maxRotation)) - Appearance.rotationOffset
         //        subview.frameCenterRotation = maxrotation

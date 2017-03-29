@@ -147,5 +147,18 @@ class Helper
         let diff = point2 - point1
         return diff
     }
+    
+    static func loadViewFromNib(name: String)->NSView?
+    {
+        var topLevelObjects = NSArray()
+        if Bundle.main.loadNibNamed("SelectionView", owner: self, topLevelObjects: &topLevelObjects)
+        {
+            let views = (topLevelObjects as Array).filter { $0 is NSView }
+            let view = views[0] as! NSView
+            return view
+        }
+        return nil
+    }
+
 
 }

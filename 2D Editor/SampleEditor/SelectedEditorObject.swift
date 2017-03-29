@@ -13,12 +13,16 @@ protocol EditorObject
 {
     var isHighlighted: Bool{get set}
     
+    var selectionView: NSView?{get set}
+    
     func getView()->NSView
+    
+    func updateSelectionView()
 }
 
 class SelectedEditorObject
 {
-    var _obj:EditorObject!
+    private var _obj:EditorObject!
     var editorObj: EditorObject
     {
         get
@@ -31,7 +35,7 @@ class SelectedEditorObject
         }
     }
     
-    var _offPoint: NSPoint!
+    private var _offPoint: NSPoint!
     var offPoint: NSPoint
     {
         get
@@ -43,7 +47,7 @@ class SelectedEditorObject
             _offPoint = newValue
         }
     }
-    
+
     init(pObj: EditorObject?, pOffPt: NSPoint?)
     {
         if let obj = pObj
