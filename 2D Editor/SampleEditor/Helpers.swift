@@ -29,15 +29,15 @@ extension NSView
    
    - returns: NSImage representation
    */
-  func snapshot() -> NSImage
-  {
-    let pdfData = dataWithPDF(inside: bounds)
-    let image = NSImage(data: pdfData)
-    return image ?? NSImage()
-  }
-    
-  func hasObjectUnderPosition(point: CGPoint)->Bool
-  {
+    func snapshot() -> NSImage
+    {
+        let pdfData = dataWithPDF(inside: bounds)
+        let image = NSImage(data: pdfData)
+        return image ?? NSImage()
+    }
+
+    func hasObjectUnderPosition(point: CGPoint)->Bool
+    {
         for child in subviews
         {
             if child.frame.contains(point)
@@ -45,9 +45,9 @@ extension NSView
                 return true
             }
         }
-    
+
         return false
-  }
+    }
 }
 
 extension NSPoint
@@ -128,3 +128,24 @@ extension NSColor
   }
 }
 
+class Helper
+{
+    static func distance(point1: NSPoint, point2: NSPoint) -> Float
+    {
+        let xDiff: CGFloat = point2.x - point1.x
+        let yDiff: CGFloat = point2.y - point1.y
+        
+        let xDiffSqr = xDiff * xDiff
+        let yDiffSqr = yDiff * yDiff
+        
+        let result:Float = sqrtf(Float(xDiffSqr) + Float(yDiffSqr))
+        return result
+    }
+    
+    static func distance(point1: CGFloat, point2: CGFloat) -> CGFloat
+    {
+        let diff = point2 - point1
+        return diff
+    }
+
+}

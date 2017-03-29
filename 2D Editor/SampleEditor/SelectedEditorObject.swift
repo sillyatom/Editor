@@ -12,6 +12,7 @@ import Cocoa
 protocol EditorObject
 {
     var isHighlighted: Bool{get set}
+    
     func getView()->NSView
 }
 

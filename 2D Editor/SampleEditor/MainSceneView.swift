@@ -20,13 +20,15 @@ class MainSceneView: NSView
     var nonURLTypes: Set<String>  { return [String(kUTTypeTIFF), String(kUTTypeJPEG), String(kUTTypePNG)] }
 
     var acceptableTypes: Set<String> { return nonURLTypes.union([NSURLPboardType]) }
-    
+    var guides: Dictionary<NSView, AnyObject>!
     var delegate: DestinationViewDelegate?
     var currentSelection: NSMutableArray!
     
     override func awakeFromNib()
     {
         self.wantsLayer = true
+        
+        guides = Dictionary<NSView, AnyObject>()
         
         //set content size
         self.frame = NSRect(x: 0.0, y: 0.0, width: 960.0, height: 640.0)
@@ -162,6 +164,13 @@ class MainSceneView: NSView
             
             let path = NSBezierPath(rect:bounds)
             path.lineWidth = Appearance.lineWidth
+            path.stroke()
+        }
+        
+        for (_, value) in guides
+        {
+            let path = value as! NSBezierPath
+            NSColor.blue.set()
             path.stroke()
         }
     }

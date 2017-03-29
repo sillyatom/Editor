@@ -39,19 +39,10 @@ class ExtImageView: NSImageView, EditorObject
         {
             super.draw(dirtyRect)
             
-            layer?.borderWidth = 2.0
-            layer?.cornerRadius = 8.0
-            layer?.masksToBounds = true
-            layer?.opacity = 0.5
-            
-            NSColor.red.set()
-            NSBezierPath.setDefaultLineWidth(2.0)
-            NSBezierPath.stroke(frame)
+            layer?.opacity = 0.75
         }
         else
         {
-            layer?.borderWidth = 0.0
-            layer?.cornerRadius = 0.0
             layer?.opacity = 1.0
             
             NSBezierPath.fill(dirtyRect)

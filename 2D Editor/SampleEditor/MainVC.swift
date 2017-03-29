@@ -23,10 +23,24 @@ enum Appearance
     static let randomNoiseStar: UInt32 = 100
 }
 
+enum MouseDirection
+{
+    static let neutral:Int = 0
+    static let up: Int = 1
+    static let down: Int = -1
+    static let left: Int = -2
+    static let right: Int = 2
+}
+
 class MainVC: NSViewController
 {
     @IBOutlet var topLayer: MainSceneView!
+
     var isDragging: Bool = false
+
+    var mouseMovingDirection: Int!
+    var lastMousePosition: NSPoint!
+    var deltaMousePosition: Float!
     
     override func viewDidLoad()
     {
@@ -37,142 +51,44 @@ class MainVC: NSViewController
     override func mouseDown(with event: NSEvent)
     {
         let screenPoint: NSPoint = NSPoint(x: event.locationInWindow.x, y: event.locationInWindow.y)
+        lastMousePosition = screenPoint
+        deltaMousePosition = Helper.distance(point1: lastMousePosition, point2: screenPoint)
         
-        //if there are no objects under click location
-        if !topLayer.hasObjectUnderPosition(point: screenPoint)
-        {
-            //unhighlight all
-            topLayer.checkForHighlights(mouseLocation: nil)
-        }
-        else
-        {
-            //if there is some object under click position
-            //and if there is one object or none selected then update the highlight
-            //if current selection count is less than or equals ONE then update highlight
-            if topLayer.currentSelection.count <= 1
-            {
-                topLayer.checkForHighlights(mouseLocation: CGPoint(x: event.locationInWindow.x, y: event.locationInWindow.y))
-            }
-        }
+        //check for selection and drag selection
+        checkSelectionOnMouseDown(with: event)
         
-        //if current selection is more than zero, update the offPoint for dragging
-        if topLayer.currentSelection.count != 0
-        {
-            for child in topLayer.currentSelection
-            {
-                let selectedChild = (child as? SelectedEditorObject)!
-                let screenPoint: NSPoint = NSPoint(x: event.locationInWindow.x, y: event.locationInWindow.y)
-                selectedChild.offPoint = self.view.convert(screenPoint, to: selectedChild.editorObj.getView())
-            }
-        }
-        //if current selection is zero start drag selection
-        else
-        {
-            topLayer.startSelection(with: event)
-        }
+        //update guides
+        //
+        //
     }
     
     override func mouseUp(with event: NSEvent)
     {
-        //if dragging end the drag session
-        if isDragging
-        {
-            topLayer.endSelection(with: event)
-        }
-        //if there are no objects under mouse click location uncheck the highlights
-        else
-        {
-            let screenPoint: NSPoint = NSPoint(x: event.locationInWindow.x, y: event.locationInWindow.y)
-            if !topLayer.hasObjectUnderPosition(point: screenPoint)
-            {
-                topLayer.checkForHighlights(mouseLocation: nil)
-            }
-        }
-        isDragging = false
+        //check for selection and drag selection
+        checkSelectionOnMouseUp(with: event)
+        
+        //update guides
+        //
+        //
     }
-
+    
     override func mouseDragged(with event: NSEvent)
     {
-        isDragging = true
+        let screenPoint: NSPoint = NSPoint(x: event.locationInWindow.x, y: event.locationInWindow.y)
+        deltaMousePosition = Helper.distance(point1: lastMousePosition, point2: screenPoint)
         
-        //drag multiple objects
-        if topLayer.currentSelection.count != 0
+        //update direction
+        updateDirection(with: event)
+        
+        //check for selection and drag selection
+        checkSelectionOnMouseDragged(with: event)
+        
+        //update guides
+        if topLayer.subviews.count > 1
         {
-            for child in topLayer.currentSelection
-            {
-                let selectedChild = (child as? SelectedEditorObject)!
-                let screenPoint: NSPoint = NSPoint(x: event.locationInWindow.x, y: event.locationInWindow.y);
-                let calcPoint: NSPoint = NSPoint(x: screenPoint.x - selectedChild.offPoint.x,
-                                                 y: screenPoint.y - selectedChild.offPoint.y)
-                selectedChild.editorObj.getView().setFrameOrigin(calcPoint)
-            }
-        }
-        else
-        {
-            //update drag selection
-            topLayer.dragSelection(with: event)
-        }
-    }
-}
-
-// MARK: - DestinationViewDelegate
-extension MainVC: DestinationViewDelegate
-{
-    func processImage(_ image: NSImage, center: NSPoint)
-    {
-        let constrainedSize = image.aspectFitSizeForMaxDimension(Appearance.maxStickerDimension)
-        
-        //3.
-        let subview = ExtImageView(frame:NSRect(x: center.x - constrainedSize.width/2, y: center.y - constrainedSize.height/2, width: constrainedSize.width, height: constrainedSize.height))
-        subview.image = image
-        view.addSubview(subview)
-        
-        //4.
-//        let maxrotation = CGFloat(arc4random_uniform(Appearance.maxRotation)) - Appearance.rotationOffset
-//        subview.frameCenterRotation = maxrotation
-        
-    }
-    
-    func processImageURLs(_ urls: [URL], center: NSPoint)
-    {
-        for (index,url) in urls.enumerated()
-        {
-            
-            //1.
-            if let image = NSImage(contentsOf:url)
-            {
-                
-                var newCenter = center
-                //2.
-                if index > 0
-                {
-                    newCenter = center.addRandomNoise(Appearance.randomNoise)
-                }
-                
-                //3.
-                processImage(image, center:newCenter)
-            }
-        }
-    }
-    
-    func processAction(_ action: String, center: NSPoint)
-    {
-        print("Process action not implemented!")    
-    }
-    
-    func updateSceneInfoPublishReady()
-    {
-        OutputWriter.sharedInstance.startPublish()
-        
-        for child in topLayer.subviews
-        {
-            let imageView = child as! ExtImageView
-            if imageView != nil
-            {
-                OutputWriter.sharedInstance.addImageView(view: imageView as! NSImageView)
-            }
+            updateGuidesOnMouseDragged(with: event)
         }
         
-        OutputWriter.sharedInstance.endPublish()
+        lastMousePosition = screenPoint
     }
 }
